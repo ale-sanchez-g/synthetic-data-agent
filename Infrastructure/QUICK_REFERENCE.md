@@ -144,7 +144,7 @@ Testing & Validation
   - generate_synthetic_data (1024MB, 300s timeout)
   - validate_schema (512MB, 60s timeout)
   - calculate_quality_metrics (512MB, 120s timeout)
-- **Lambda Layers** (optional) (2-3)
+- **Lambda Layers** (optional) (2-3 layers for dependencies)
 
 ### Storage
 - **S3 Buckets** (2)
@@ -159,26 +159,34 @@ Testing & Validation
   - Embedding Model: Titan Embed Text v1
 
 ### Security
-- **IAM Roles** (5+)
-  - Bedrock Agent role
+- **IAM Roles** (5)
+  - Bedrock Agent role (1)
   - Lambda execution roles (3)
-  - Knowledge base role
+  - Knowledge base role (1)
 - **KMS Keys** (3)
   - S3 encryption
   - DynamoDB encryption
   - CloudWatch Logs encryption
 
 ### Monitoring
-- **CloudWatch Log Groups** (4+)
-- **CloudWatch Alarms** (5+)
-- **SNS Topics** (1)
+- **CloudWatch Log Groups** (4-5)
+  - Bedrock Agent logs (1)
+  - Lambda function logs (3)
+  - Additional application logs (0-1)
+- **CloudWatch Alarms** (5-10 depending on monitoring needs)
+  - Lambda errors, execution time, throttles
+  - DynamoDB throttles
+  - S3 storage thresholds
+- **SNS Topics** (1 for alarm notifications)
 - **CloudWatch Dashboard** (1, optional)
 
 ### Networking (Optional)
 - **VPC** (1)
-- **Subnets** (4+)
-- **NAT Gateways** (2)
-- **VPC Endpoints** (multiple)
+- **Subnets** (4-6 across 2-3 AZs)
+  - Private subnets (2-3)
+  - Public subnets (2-3)
+- **NAT Gateways** (2 for high availability)
+- **VPC Endpoints** (3-5 for AWS services: S3, DynamoDB, Bedrock)
 
 ---
 
@@ -440,5 +448,5 @@ Infrastructure/
 ---
 
 **Document Owner:** DevOps/Infrastructure Team  
-**Last Updated:** 2024  
+**Last Updated:** January 12, 2026  
 **Status:** Initial Draft

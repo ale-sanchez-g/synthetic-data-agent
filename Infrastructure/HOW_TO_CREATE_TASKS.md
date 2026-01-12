@@ -79,8 +79,9 @@ You have the following resources to create comprehensive tasks:
    ```bash
    #!/bin/bash
    # File: create-issues-from-csv.sh
+   # Update REPO variable to match your repository
    
-   REPO="ale-sanchez-g/synthetic-data-agent"
+   REPO="ale-sanchez-g/synthetic-data-agent"  # UPDATE THIS for other repos
    PROJECT_NUMBER=4
    CSV_FILE="Infrastructure/TASKS.csv"
    
@@ -490,5 +491,5 @@ If you need assistance:
 
 ---
 
-**Last Updated:** January 2024  
+**Last Updated:** January 12, 2026  
 **Version:** 1.0
