@@ -7,9 +7,11 @@ This directory contains infrastructure as code (IaC) for deploying and managing 
 Comprehensive task breakdown and planning documents have been created for the infrastructure implementation:
 
 ### Quick Access
+- **[HOW_TO_CREATE_TASKS.md](HOW_TO_CREATE_TASKS.md)** - ⭐ **START HERE** - Step-by-step guide to create GitHub Project tasks
 - **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Overview, summary, and quick start guide
 - **[TASKS.md](TASKS.md)** - Detailed task breakdown with 40+ tasks organized into 11 phases
 - **[GITHUB_ISSUES_TEMPLATE.md](GITHUB_ISSUES_TEMPLATE.md)** - Ready-to-use GitHub issue templates
+- **[ROADMAP.md](ROADMAP.md)** - Visual timeline, milestones, and implementation roadmap
 - **[TASKS.csv](TASKS.csv)** - Spreadsheet format for project management tools
 
 ### GitHub Project Board
