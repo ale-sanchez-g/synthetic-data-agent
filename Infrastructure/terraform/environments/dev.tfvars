@@ -11,7 +11,7 @@ cost_center = "engineering"
 
 # Bedrock Agent
 bedrock_agent_name          = "sdga-datagen-agent-dev"
-bedrock_foundation_model    = "anthropic.claude-3-sonnet-20240229-v1:0"
+bedrock_foundation_model    = "amazon.nova-pro-v1:0"
 bedrock_agent_idle_timeout  = 600
 bedrock_embedding_model_arn = "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v1"
 

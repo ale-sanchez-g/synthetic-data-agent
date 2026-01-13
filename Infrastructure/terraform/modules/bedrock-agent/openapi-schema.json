@@ -1,0 +1,492 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Synthetic Data Generation API",
+    "description": "API for generating synthetic test data with compliance and quality validation",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/generate-synthetic-data": {
+      "post": {
+        "summary": "Generate Synthetic Data",
+        "description": "Generates synthetic test data based on provided schema and requirements",
+        "operationId": "generateSyntheticData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateDataRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synthetic data generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or schema validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error during data generation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validate-schema": {
+      "post": {
+        "summary": "Validate Data Schema",
+        "description": "Validates a data schema for correctness and compliance before generation",
+        "operationId": "validateSchema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateSchemaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Schema validation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateSchemaResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid schema format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calculate-quality-metrics": {
+      "post": {
+        "summary": "Calculate Data Quality Metrics",
+        "description": "Analyzes generated data and calculates quality metrics",
+        "operationId": "calculateQualityMetrics",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QualityMetricsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quality metrics calculated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QualityMetricsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or data not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GenerateDataRequest": {
+        "type": "object",
+        "required": ["data_type", "volume", "schema", "output_format"],
+        "properties": {
+          "data_type": {
+            "type": "string",
+            "enum": ["user_profile", "transaction", "log_event", "custom"],
+            "description": "Type of data to generate"
+          },
+          "volume": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "description": "Number of records to generate"
+          },
+          "schema": {
+            "type": "object",
+            "required": ["fields"],
+            "properties": {
+              "fields": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/components/schemas/FieldDefinition"
+                }
+              }
+            }
+          },
+          "compliance_requirements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["GDPR", "HIPAA", "PCI-DSS", "SOC2", "CCPA"]
+            },
+            "description": "Compliance standards to adhere to"
+          },
+          "output_format": {
+            "type": "string",
+            "enum": ["json", "csv", "sql", "parquet"],
+            "description": "Format for generated data"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Destination"
+          }
+        }
+      },
+      "FieldDefinition": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+            "description": "Field name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "integer", "float", "date", "datetime", "email", "phone", "address", "uuid", "boolean"],
+            "description": "Data type of the field"
+          },
+          "constraints": {
+            "$ref": "#/components/schemas/FieldConstraints"
+          }
+        }
+      },
+      "FieldConstraints": {
+        "type": "object",
+        "properties": {
+          "min": {
+            "type": "number",
+            "description": "Minimum value for numeric types or minimum length for strings"
+          },
+          "max": {
+            "type": "number",
+            "description": "Maximum value for numeric types or maximum length for strings"
+          },
+          "format": {
+            "type": "string",
+            "description": "Format pattern (e.g., date format, regex pattern)"
+          },
+          "nullable": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether field can be null"
+          },
+          "unique": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether values must be unique"
+          },
+          "enum": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of allowed values"
+          }
+        }
+      },
+      "Destination": {
+        "type": "object",
+        "required": ["type", "location"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["s3", "local", "inline"],
+            "description": "Destination type"
+          },
+          "location": {
+            "type": "string",
+            "description": "Destination path or URL"
+          }
+        }
+      },
+      "GenerateDataResponse": {
+        "type": "object",
+        "required": ["generation_id", "status", "records_generated"],
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for this generation"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "partial", "failed"],
+            "description": "Generation status"
+          },
+          "records_generated": {
+            "type": "integer",
+            "description": "Number of records successfully generated"
+          },
+          "output_location": {
+            "type": "string",
+            "description": "Location where generated data is stored"
+          },
+          "data_quality_metrics": {
+            "$ref": "#/components/schemas/QualityMetrics"
+          },
+          "execution_time_ms": {
+            "type": "integer",
+            "description": "Execution time in milliseconds"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of errors encountered"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of warnings"
+          }
+        }
+      },
+      "ValidateSchemaRequest": {
+        "type": "object",
+        "required": ["schema"],
+        "properties": {
+          "schema": {
+            "type": "object",
+            "required": ["fields"],
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/FieldDefinition"
+                }
+              }
+            }
+          },
+          "compliance_requirements": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["GDPR", "HIPAA", "PCI-DSS", "SOC2", "CCPA"]
+            }
+          }
+        }
+      },
+      "ValidateSchemaResponse": {
+        "type": "object",
+        "required": ["valid"],
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "Whether schema is valid"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["error", "warning"]
+                }
+              }
+            }
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Suggestions for schema improvements"
+          },
+          "compliance_issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "requirement": {
+                  "type": "string"
+                },
+                "issue": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "QualityMetricsRequest": {
+        "type": "object",
+        "required": ["generation_id"],
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the data generation to analyze"
+          },
+          "data_location": {
+            "type": "string",
+            "description": "Location of data to analyze (if not using generation_id)"
+          }
+        }
+      },
+      "QualityMetricsResponse": {
+        "type": "object",
+        "required": ["generation_id", "metrics"],
+        "properties": {
+          "generation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/QualityMetrics"
+          },
+          "analysis_time_ms": {
+            "type": "integer",
+            "description": "Time taken to analyze data"
+          }
+        }
+      },
+      "QualityMetrics": {
+        "type": "object",
+        "properties": {
+          "uniqueness_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Percentage of unique values for unique fields"
+          },
+          "validity_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Percentage of values meeting constraints"
+          },
+          "completeness_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Percentage of non-null values for non-nullable fields"
+          },
+          "distribution_analysis": {
+            "type": "object",
+            "properties": {
+              "mean": {
+                "type": "number"
+              },
+              "median": {
+                "type": "number"
+              },
+              "std_dev": {
+                "type": "number"
+              },
+              "distribution_type": {
+                "type": "string",
+                "enum": ["normal", "uniform", "skewed", "bimodal"]
+              }
+            }
+          },
+          "field_statistics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "null_count": {
+                  "type": "integer"
+                },
+                "unique_count": {
+                  "type": "integer"
+                },
+                "min_value": {},
+                "max_value": {},
+                "avg_length": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error code or type"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error details"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the error occurred"
+          }
+        }
+      }
+    }
+  }
+}
